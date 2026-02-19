@@ -1,0 +1,1 @@
+This repository is a companion to tutorials on [shopify.dev](https://shopify.dev) and doesn't accept external contributions. If you find an issue with the tutorial content, use the feedback form on the tutorial page.
