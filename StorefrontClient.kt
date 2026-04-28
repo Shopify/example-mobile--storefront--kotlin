@@ -3,6 +3,12 @@ package com.shopify.example.storefront
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -84,17 +90,19 @@ class StorefrontClient(
             }
         """.trimIndent()
 
-        val variables = mapOf(
-            "input" to mapOf(
-                "lines" to listOf(
-                    mapOf("merchandiseId" to variantId, "quantity" to quantity)
-                )
-            )
-        )
-
-        val body = Json.encodeToString(
-            mapOf("query" to mutation, "variables" to variables)
-        )
+        val body = buildJsonObject {
+            put("query", mutation)
+            putJsonObject("variables") {
+                putJsonObject("input") {
+                    putJsonArray("lines") {
+                        addJsonObject {
+                            put("merchandiseId", variantId)
+                            put("quantity", quantity)
+                        }
+                    }
+                }
+            }
+        }.toString()
         connection.outputStream.write(body.toByteArray())
 
         val response = connection.inputStream.bufferedReader().readText()

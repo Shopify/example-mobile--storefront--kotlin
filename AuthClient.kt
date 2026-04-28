@@ -178,11 +178,26 @@ class AuthClient(
             .build()
 
         val response = httpClient.newCall(request).execute()
-        val json = org.json.JSONObject(response.body!!.string())
-        return json.getJSONObject("data")
-            .getJSONObject("cartCreate")
-            .getJSONObject("cart")
-            .getString("checkoutUrl")
+        val responseJson = org.json.JSONObject(response.body!!.string())
+
+        responseJson.optJSONArray("errors")?.let { errors ->
+            if (errors.length() > 0) {
+                throw Exception(errors.getJSONObject(0).optString("message", "GraphQL error"))
+            }
+        }
+
+        val cartCreate = responseJson.optJSONObject("data")?.optJSONObject("cartCreate")
+            ?: throw Exception("cartCreate not returned in response")
+
+        cartCreate.optJSONArray("userErrors")?.let { userErrors ->
+            if (userErrors.length() > 0) {
+                throw Exception(userErrors.getJSONObject(0).optString("message", "Cart user error"))
+            }
+        }
+
+        return cartCreate.optJSONObject("cart")?.optString("checkoutUrl")
+            ?.takeIf { it.isNotEmpty() }
+            ?: throw Exception("Cart creation failed: no checkout URL returned")
     }
     // [END auth.create-authenticated-cart]
 
