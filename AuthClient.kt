@@ -83,7 +83,10 @@ class AuthClient(
 
     private fun generateRandomString(length: Int): String {
         val characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        return (1..length).map { characters.random() }.joinToString("")
+        val secureRandom = SecureRandom()
+        return (1..length)
+            .map { characters[secureRandom.nextInt(characters.length)] }
+            .joinToString("")
     }
     // [END auth.build-auth-url]
 
