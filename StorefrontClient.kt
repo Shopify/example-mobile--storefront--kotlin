@@ -119,7 +119,8 @@ class StorefrontClient(
 
     // [START integrate.cart-permalink]
     fun buildCartPermalink(variantId: String, quantity: Int = 1): String {
-        return "https://$shopDomain/cart/$variantId:$quantity"
+        val numericVariantId = variantId.substringAfterLast('/')
+        return "https://$shopDomain/cart/$numericVariantId:$quantity"
     }
     // [END integrate.cart-permalink]
 }

@@ -4,6 +4,8 @@ import android.net.Uri
 import com.shopify.checkoutsheetkit.ShopifyCheckoutSheetKit
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -44,7 +46,7 @@ class AuthClient(
     // MARK: Endpoint Discovery
 
     // [START auth.discover-endpoints]
-    suspend fun discoverAuthEndpoints(): Pair<String, String> {
+    suspend fun discoverAuthEndpoints(): Pair<String, String> = withContext(Dispatchers.IO) {
         val discoveryUrl = "https://$shopDomain/.well-known/openid-configuration"
         val request = Request.Builder().url(discoveryUrl).build()
         val response = httpClient.newCall(request).execute()
@@ -53,7 +55,7 @@ class AuthClient(
         val authEndpoint = config.getString("authorization_endpoint")
         val tokenEndpoint = config.getString("token_endpoint")
 
-        return Pair(authEndpoint, tokenEndpoint)
+        Pair(authEndpoint, tokenEndpoint)
     }
     // [END auth.discover-endpoints]
 
@@ -111,8 +113,8 @@ class AuthClient(
     // MARK: Token Exchange
 
     // [START auth.exchange-token]
-    suspend fun requestAccessToken(code: String): OAuthTokenResult {
-        val codeVerifier = this.codeVerifier
+    suspend fun requestAccessToken(code: String): OAuthTokenResult = withContext(Dispatchers.IO) {
+        val codeVerifier = this@AuthClient.codeVerifier
             ?: throw IllegalStateException("Code verifier not found. Call buildAuthorizationUrl() first.")
 
         val (_, tokenEndpoint) = discoverAuthEndpoints()
@@ -133,7 +135,7 @@ class AuthClient(
         val response = httpClient.newCall(request).execute()
         val json = org.json.JSONObject(response.body!!.string())
 
-        return OAuthTokenResult(
+        OAuthTokenResult(
             accessToken = json.getString("access_token"),
             refreshToken = json.getString("refresh_token"),
             expiresIn = json.getInt("expires_in")
@@ -144,7 +146,7 @@ class AuthClient(
     // MARK: Authenticated Cart
 
     // [START auth.create-authenticated-cart]
-    suspend fun createAuthenticatedCart(variantId: String, accessToken: String): String {
+    suspend fun createAuthenticatedCart(variantId: String, accessToken: String): String = withContext(Dispatchers.IO) {
         val query = """
             mutation cartCreate(${'$'}input: CartInput!) {
                 cartCreate(input: ${'$'}input) {
@@ -198,7 +200,7 @@ class AuthClient(
             }
         }
 
-        return cartCreate.optJSONObject("cart")?.optString("checkoutUrl")
+        cartCreate.optJSONObject("cart")?.optString("checkoutUrl")
             ?.takeIf { it.isNotEmpty() }
             ?: throw Exception("Cart creation failed: no checkout URL returned")
     }
