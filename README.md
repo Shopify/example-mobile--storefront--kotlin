@@ -1,33 +1,36 @@
 # Mobile Storefront — Kotlin
 
-Sample Android app that fetches products from Shopify using the Storefront API, creates a cart, and presents checkout with [Checkout Kit for Android](https://github.com/Shopify/checkout-sheet-kit-android).
+Companion code for [shopify.dev](https://shopify.dev) tutorials covering the Storefront API, [Checkout Kit for Android](https://github.com/Shopify/checkout-sheet-kit-android), and Customer Account API authentication.
 
-This code accompanies the following tutorials on [shopify.dev](https://shopify.dev):
+> **This repository is not a standalone runnable app.** It contains the source files referenced inline by the tutorials. To use them, drop the files into an existing Android project and add the dependencies listed below.
 
-- [Build a mobile storefront](https://shopify.dev/docs/storefronts/mobile/complete-tutorial)
-- [Embed Checkout Kit](https://shopify.dev/docs/storefronts/mobile/checkout-kit/integrate)
+## Tutorials
+
+- [Build a mobile storefront](https://shopify.dev/docs/storefronts/mobile/build-mobile-storefront)
+- [Embed Checkout Kit](https://shopify.dev/docs/storefronts/mobile/checkout-kit)
+- [Authenticate checkouts](https://shopify.dev/docs/storefronts/mobile/checkout-kit/authenticate-checkouts)
 
 ## What's included
 
 | File | Description |
 |---|---|
-| `StorefrontClient.kt` | Storefront API client — product queries and cart creation |
+| `StorefrontClient.kt` | Storefront API client — product queries, cart creation, cart permalinks |
 | `Models.kt` | Serializable data classes for GraphQL responses |
 | `ProductListScreen.kt` | Jetpack Compose product list with Add to Cart |
 | `CartActivity.kt` | Checkout Kit integration with event handling |
+| `AuthClient.kt` | OAuth + PKCE flow against the Customer Account API |
 
-## Run locally
+## Use these snippets in your project
 
-1. Clone this repo.
-2. Open the project in Android Studio.
+1. Copy the relevant files into your Android project (typically under `app/src/main/java/`).
+2. Add the [Checkout Sheet Kit Android library](https://github.com/Shopify/checkout-sheet-kit-android) and the dependencies imported by these files (OkHttp, kotlinx-serialization, kotlinx-coroutines, AppCompat, lifecycle-runtime-ktx, and Jetpack Compose if you're using `ProductListScreen.kt`).
 3. In `StorefrontClient.kt`, replace `{shop}.myshopify.com` with your store domain and add your Storefront API access token.
-4. Build and run on an emulator or device (SDK 23+).
 
 ## Requirements
 
-- Android Studio Arctic Fox+
-- Android SDK 23+ (Android 6.0)
-- JDK 17+
+- Android Studio Arctic Fox or later
+- Android SDK 23 or later (Android 6.0)
+- JDK 17 or later
 - A [Shopify development store](https://shopify.dev/docs/storefronts/headless/building-with-the-storefront-api/getting-started) with at least one product
 - A Storefront API access token with `unauthenticated_read_product_listings` and `unauthenticated_write_checkouts` scopes
 
